@@ -1,86 +1,102 @@
-# 经颅超声声场建模
+# Transcranial Ultrasound Field Modeling
 
-经颅超声神经调控相关的声场仿真代码整理（**MATLAB + [k-Wave](http://www.k-wave.org/)**）。
+MATLAB + [k-Wave](http://www.k-wave.org/) pipeline for **demonstrating** acoustic-field simulation related to transcranial ultrasound neuromodulation.
 
 | | |
 |---|---|
-| 课题 | 《经颅超声神经调控中声场建模仿真研究》 |
-| 作者 | 王驰宇（西安交通大学 · 生命科学与技术学院 · 生物医学工程） |
-| 指导教师 | 张思远（未直接参与本仓库开发） |
-| 定稿 | 2024 年 6 月 |
+| **Thesis (ZH)** | 《经颅超声神经调控中声场建模仿真研究》 |
+| **Author** | Chiyu Wang (Wang Chiyu), B.Eng. Biomedical Engineering, Xi’an Jiaotong University |
+| **School** | School of Life Science and Technology |
+| **Advisor** | Siyuan Zhang (*thesis advisor; did not contribute code to this repository*) |
+| **Completed** | June 2024 |
 
-**代码来源：** 基于导师课题组提供的初版仿真脚本，由作者整理、重构为可运行流程。
+This public repository reorganizes simulation scripts that started from an **initial prototype provided by the advisor’s research group**, then refactored by the author into a runnable demo pipeline.
 
-> **公开仓范围：** 只保留可演示的声学流程与**程序生成的大致轮廓**几何。论文阶段用过的真实生理影像、颅骨分割与本机路径**均不在本仓**，也无法从本仓还原。
+> **Scope of the public code:** synthetic, non-anatomical geometry only (coarse procedural outlines). Imaging used in the thesis manuscript is **not** included and **cannot** be recovered from this repository (destructive de-identification: real volumes, masks, and local paths were removed rather than reversibly masked).
 
-## 课题在做什么（论文脉络，摘要级）
+---
 
-超声神经调控需经颅骨到达靶区，颅骨散射使剂量与调控范围难以先验估计。论文用数值仿真观察**碗状凹面换能器**在不同传播条件下的声场，评估聚焦性质及经颅条件对预设焦点/波束的影响。
+## Motivation (thesis, summary)
 
-论文结构概览：
+Focused ultrasound for neuromodulation must cross the skull, which scatters and attenuates the beam and complicates dose / focus prediction. The undergraduate thesis studied bowl-shaped concave transducers in numerical experiments (free field, planar attenuating layer, and transcranial settings in the manuscript) using MATLAB and k-Wave, with a shared workflow: define the grid → assign medium properties (sound speed, density, absorption) → define the source mask and drive signal.
 
-1. **绪论** — 超声神经调控、经颅声仿真现状、仿真内容与参数设置  
-2. **聚焦超声换能器声场仿真** — 自由场、不同规格、平面衰减层；工具与网格要求  
-3. **经颅超声声场仿真研究** — 计算域 / 介质 / 换能器设置与多组结果（论文正文含影像预处理等步骤；**对应数据未入库**）  
-4. **结论与展望**
+**Public demo vs thesis:** the manuscript discussed image-based skull geometry. This repository **does not** ship those data or that preprocessing path. Demo transducer / frequency settings may differ from the thesis figures; treat the code as a privacy-safe pipeline sketch.
 
-**方法要点：** MATLAB + k-Wave；统一步骤为：定义网格 → 设置介质声速/密度/吸收 → 设置声源掩膜与发射时间序列。
+### Thesis outline (high level)
 
-**结论要点（论文自述，概括）：** 同径下曲率半径更大时聚焦更好；平面衰减层会阻挡并沿界面扩散；颅骨显著阻碍预设自由场焦点；经颅多组对比用于观察发射方案表现。作者自述尚不足以直接给出临床方案，但完成了经颅仿真参数设置与尝试性计算的目标。
+1. Introduction — neuromodulation context, prior work, study design  
+2. Focused-transducer field simulation — free field, parameter variants, planar attenuating layer; tools and grid requirements  
+3. Transcranial field study — domain / medium / transducer setup and result groups (**imaging steps described in the thesis only; data not in-repo**)  
+4. Conclusions and outlook  
 
-关键词：经颅超声仿真；神经调控；声场仿真
+**Takeaways (author’s own summary):** larger radius of curvature (same aperture) tended to focus better in the free-field comparisons; a planar attenuating layer blocked and spread energy along the interface; the skull strongly disturbed the free-field focus; transcranial cases were exploratory. The work set up a transcranial simulation workflow but was not intended as a clinical protocol.
 
-## 本仓库实际提供什么
+Keywords: transcranial ultrasound simulation; neuromodulation; acoustic field modeling
 
-与论文全文不同，本仓库是**去隐私后的演示管道**：
+---
 
-- 几何：`make_demo_phantom` 生成的椭圆环示意（仅大致轮廓，非解剖）  
-- 介质：示意「水 / 骨」两相映射  
-- 声源：约 0.5 MHz 相关演示参数（与论文部分参数可能不同，以代码为准）  
-- 无 CT/MRI/DICOM，无真实颅骨数组
+## Quick start
 
-### 流程
+**Requirements**
 
-```text
-make_demo_phantom     合成大致轮廓 + bone mask
-        ↓
-build_medium          两相介质（水 / “骨”）
-        ↓
-setup_source_sensor   网格、演示用声源与传感器条带
-        ↓
-run_simulation        k-Wave 2D（需工具箱）
-        ↓
-visualize_results     出图；写入 examples/
-```
+- MATLAB  
+- [k-Wave](http://www.k-wave.org/) on the MATLAB path (optional for geometry export only)
 
 ```matlab
 cd matlab
 run_pipeline
 ```
 
-无 k-Wave 时仍会导出合成轮廓示例图。
+Without k-Wave, the pipeline still writes synthetic example images under `examples/`.
 
-## 隐私与去标识（强制）
+### Pipeline
 
-- 无真实生理影像，无受试者/患者数据，无本机影像路径。  
-- `examples/` 仅为合成 PNG/数组，与任何临床或实验扫描**无对应关系**。  
-- 论文中涉及真实影像的预处理与经颅几何构建步骤，**不在本公开代码路径中复现**。
+```text
+make_demo_phantom  →  procedural outline + bone mask
+build_medium       →  two-material water / “bone” map
+setup_source_sensor → grid, demo source & sensor strip
+run_simulation     → k-Wave 2-D (if available)
+visualize_results  → figures + examples/
+```
 
-## 文件
+---
 
-| 路径 | 作用 |
+## Privacy & ethics
+
+This project uses **destructive de-identification** for anything that could point back to real physiological imaging:
+
+- No CT / MRI / DICOM, no subject identifiers, no recoverable skull segmentations  
+- Geometry is a **coarse synthetic outline** (e.g. elliptical ring), not an anatomical phantom derived from a scan  
+- Local paths and thesis imaging directories are omitted from the public tree  
+
+Do **not** commit real head volumes, clinical exports, full thesis PDFs with embedded scans, or reversible “masked” copies of the same data.
+
+---
+
+## Repository layout
+
+| Path | Role |
 |------|------|
-| `matlab/run_pipeline.m` | 总入口 |
-| `matlab/make_demo_phantom.m` 等 | 流程各步 |
-| `matlab/stimulation_1.m` / `tiqv.m` 等 | 旧文件名跳转/遗留片段 |
-| `examples/` | 合成示例 |
-| `notes/` | 参数片段；不含本机隐私路径 |
+| `matlab/run_pipeline.m` | End-to-end entry point |
+| `matlab/*.m` | Pipeline steps and legacy redirects |
+| `examples/` | Synthetic PNGs / arrays only |
+| `notes/` | Non-sensitive parameter notes |
 
-## 依赖
+---
 
-- MATLAB  
-- k-Wave（仅仿真步需要）
+## Citation
 
-## 不要提交
+If you use this demo pipeline, please cite the undergraduate thesis (Chinese title above), author Chiyu Wang, Xi’an Jiaotong University, June 2024. This repository is a **code companion**, not a substitute for the full thesis.
 
-口令、DICOM、真实头颅/颅骨掩膜、论文全文与答辩 PPT、MATLAB 安装树、k-Wave 手册、任何可还原真实扫描的中间文件。
+---
+
+## License
+
+No SPDX license file is attached yet. All rights reserved by the author unless a license is added later. Third-party toolboxes (MATLAB, k-Wave) remain under their own terms.
+
+---
+
+## Related
+
+- Do not vendor MATLAB or k-Wave into this repo.  
+- Companion student projects on the same account include course algorithm drills and MCU lab notes; this tree is ultrasound-field modeling only.
