@@ -5,6 +5,7 @@ MATLAB + [k-Wave](http://www.k-wave.org/) pipeline for **demonstrating** acousti
 | | |
 |---|---|
 | **Thesis (ZH)** | 《经颅超声神经调控中声场建模仿真研究》 |
+| **English title** | Informal translation only (no official English title on the cover): *Acoustic field modeling and simulation for transcranial ultrasound neuromodulation* |
 | **Author** | Chiyu Wang (Wang Chiyu), B.Eng. Biomedical Engineering, Xi’an Jiaotong University |
 | **School** | School of Life Science and Technology |
 | **Advisor** | Siyuan Zhang (*thesis advisor; did not contribute code to this repository*) |
@@ -20,7 +21,9 @@ This public repository reorganizes simulation scripts that started from an **ini
 
 Focused ultrasound for neuromodulation must cross the skull, which scatters and attenuates the beam and complicates dose / focus prediction. The undergraduate thesis studied bowl-shaped concave transducers in numerical experiments (free field, planar attenuating layer, and transcranial settings in the manuscript) using MATLAB and k-Wave, with a shared workflow: define the grid → assign medium properties (sound speed, density, absorption) → define the source mask and drive signal.
 
-**Public demo vs thesis:** the manuscript discussed image-based skull geometry. This repository **does not** ship those data or that preprocessing path. Demo transducer / frequency settings may differ from the thesis figures; treat the code as a privacy-safe pipeline sketch.
+**Public demo vs thesis:** the manuscript discussed image-based skull geometry. This repository **does not** ship those data or that preprocessing path. **Demo parameters may differ from the thesis** — e.g. the thesis transcranial cases used about **300 kHz**, while the public demo currently drives about **0.5 MHz** in `setup_source_sensor.m`. Treat the code as a privacy-safe pipeline sketch, not a figure-for-figure reproduction.
+
+Thesis ABSTRACT keywords (as printed): *Transcranial ultrasonic simulation; Neuroregulation; Sonic field simulation*.
 
 ### Thesis outline (high level)
 
