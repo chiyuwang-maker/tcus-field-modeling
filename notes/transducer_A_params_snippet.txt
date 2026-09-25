@@ -1,3 +1,6 @@
+# Abstract parameter fragment from thesis notes (no paths, no imaging).
+# Demo pipeline defaults live in matlab/demo_params.m (2-D lightweight grid).
+# Paper-scale 3-D reference mentioned below is NOT what run_pipeline uses.
 source_diameter=15e-3
 source_roc=150e-3
 source_amp=1e6

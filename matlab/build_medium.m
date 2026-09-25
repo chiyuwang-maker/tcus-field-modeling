@@ -1,18 +1,22 @@
-function medium = build_medium(bone_mask)
-%BUILD_MEDIUM  Map demo bone mask to a simple two-material acoustic medium.
+function medium = build_medium(bone_mask, P)
+%BUILD_MEDIUM  Map synthetic bone mask to a two-material acoustic medium.
+%   Naming: water / bone (formerly shui / lugu — Chinese pinyin for water / skull bone).
+%   Absorption uses k-Wave power-law form:
+%     alpha_coeff [dB/(MHz^y cm)], alpha_power = y (must be non-zero).
+%   Values are demo nominals, not fitted to any real scan.
 
-shui = ones(size(bone_mask)) - bone_mask;
+if nargin < 2 || isempty(P)
+    P = demo_params();
+end
 
-lugu_speed = 3360;
-lugu_density = 1750;
-lugu_alpha = 0.8 * (0.5e6)^1.35;
+water = 1 - bone_mask;   % shui → water
+bone  = bone_mask;       % lugu → bone
 
-shui_speed = 1580;
-shui_density = 1000;
-shui_alpha = 0.02 * (5e5)^2;
+medium.sound_speed = water * P.water.sound_speed + bone * P.bone.sound_speed;
+medium.density     = water * P.water.density     + bone * P.bone.density;
+medium.alpha_coeff = water * P.water.alpha_coeff + bone * P.bone.alpha_coeff;
 
-medium.sound_speed = shui * shui_speed + bone_mask * lugu_speed;
-medium.density     = shui * shui_density + bone_mask * lugu_density;
-medium.alpha_coeff = shui * shui_alpha + bone_mask * lugu_alpha;
-medium.alpha_power = 0;
+% alpha_power: scalar is fine when a single power applies; here bone and water
+% differ, so use a same-size map (supported by k-Wave when sizes match fields).
+medium.alpha_power = water * P.water.alpha_power + bone * P.bone.alpha_power;
 end

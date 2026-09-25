@@ -1,78 +1,76 @@
 # Transcranial Ultrasound Field Modeling
 
-MATLAB + [k-Wave](http://www.k-wave.org/) pipeline for **demonstrating** acoustic-field simulation related to transcranial ultrasound neuromodulation.
+MATLAB + [k-Wave](http://www.k-wave.org/) **demo pipeline** for acoustic-field simulation related to transcranial ultrasound neuromodulation.
 
 | | |
 |---|---|
 | **Thesis (ZH)** | 《经颅超声神经调控中声场建模仿真研究》 |
 | **English title** | Informal translation only (no official English title on the cover): *Acoustic field modeling and simulation for transcranial ultrasound neuromodulation* |
-| **Author** | Chiyu Wang (Wang Chiyu), B.Eng. Biomedical Engineering, Xi’an Jiaotong University |
+| **Author** | Chiyu Wang, B.Eng. Biomedical Engineering, Xi’an Jiaotong University |
 | **School** | School of Life Science and Technology |
 | **Advisor** | Siyuan Zhang (*thesis advisor; did not contribute code to this repository*) |
 | **Completed** | June 2024 |
 
-This public repository reorganizes simulation scripts that started from an **initial prototype provided by the advisor’s research group**, then refactored by the author into a runnable demo pipeline.
+Public code reorganizes scripts that began as an **initial prototype from the advisor’s research group**, then refactored by the author into a runnable, privacy-safe demo.
 
-> **Scope of the public code:** synthetic, non-anatomical geometry only (coarse procedural outlines). Imaging used in the thesis manuscript is **not** included and **cannot** be recovered from this repository (destructive de-identification: real volumes, masks, and local paths were removed rather than reversibly masked).
+> **Destructive de-identification:** only procedural, non-anatomical outlines ship here. Thesis imaging, skull segmentations, and local paths are **removed**, not reversibly masked, and **cannot** be recovered from this repository.
 
 ---
 
 ## Motivation (thesis, summary)
 
-Focused ultrasound for neuromodulation must cross the skull, which scatters and attenuates the beam and complicates dose / focus prediction. The undergraduate thesis studied bowl-shaped concave transducers in numerical experiments (free field, planar attenuating layer, and transcranial settings in the manuscript) using MATLAB and k-Wave, with a shared workflow: define the grid → assign medium properties (sound speed, density, absorption) → define the source mask and drive signal.
+Focused ultrasound for neuromodulation must cross the skull. The undergraduate thesis studied bowl-shaped concave transducers numerically (free field, planar attenuating layer, and transcranial settings in the manuscript) with MATLAB and k-Wave: define the grid → medium properties → source mask and drive signal.
 
-**Public demo vs thesis:** the manuscript discussed image-based skull geometry. This repository **does not** ship those data or that preprocessing path. **Demo parameters may differ from the thesis** — e.g. the thesis transcranial cases used about **300 kHz**, while the public demo currently drives about **0.5 MHz** in `setup_source_sensor.m`. Treat the code as a privacy-safe pipeline sketch, not a figure-for-figure reproduction.
+**Public demo vs thesis:** the manuscript discussed image-based skull geometry; that data is **not** in this repo. Demo parameters are centralized in `matlab/demo_params.m` (default **f0 = 300 kHz**, aligned with the thesis order of magnitude). The demo remains a lightweight **2-D** sketch (not the thesis 3-D grid).
 
 Thesis ABSTRACT keywords (as printed): *Transcranial ultrasonic simulation; Neuroregulation; Sonic field simulation*.
 
 ### Thesis outline (high level)
 
-1. Introduction — neuromodulation context, prior work, study design  
-2. Focused-transducer field simulation — free field, parameter variants, planar attenuating layer; tools and grid requirements  
-3. Transcranial field study — domain / medium / transducer setup and result groups (**imaging steps described in the thesis only; data not in-repo**)  
+1. Introduction  
+2. Focused-transducer field simulation (free field, variants, planar layer)  
+3. Transcranial study (manuscript only for imaging steps; **no in-repo data**)  
 4. Conclusions and outlook  
-
-**Takeaways (author’s own summary):** larger radius of curvature (same aperture) tended to focus better in the free-field comparisons; a planar attenuating layer blocked and spread energy along the interface; the skull strongly disturbed the free-field focus; transcranial cases were exploratory. The work set up a transcranial simulation workflow but was not intended as a clinical protocol.
-
-Keywords: transcranial ultrasound simulation; neuromodulation; acoustic field modeling
 
 ---
 
 ## Quick start
 
-**Requirements**
-
-- MATLAB  
-- [k-Wave](http://www.k-wave.org/) on the MATLAB path (optional for geometry export only)
+**Requirements:** MATLAB; [k-Wave](http://www.k-wave.org/) on the path (optional if you only need geometry export).
 
 ```matlab
 cd matlab
+% In run_pipeline.m set:  scenario = 'shell' | 'free' | 'plate'
 run_pipeline
 ```
 
-Without k-Wave, the pipeline still writes synthetic example images under `examples/`.
+Without k-Wave, synthetic PNGs are still written under `examples/`. Without MATLAB:
+
+```bash
+python3 scripts/export_demo_geometry.py --scenario shell
+python3 scripts/check_matlab_static.py
+```
 
 ### Pipeline
 
 ```text
-make_demo_phantom  →  procedural outline + bone mask
-build_medium       →  two-material water / “bone” map
-setup_source_sensor → grid, demo source & sensor strip
-run_simulation     → k-Wave 2-D (if available)
-visualize_results  → figures + examples/
+demo_params          → central demo defaults / scenario
+make_demo_phantom    → procedural free | plate | shell outline
+build_medium         → water / bone-like map
+setup_source_sensor  → grid (kWaveGrid or makeGrid), arc source, sensor
+run_simulation       → k-Wave 2-D (if available)
+visualize_results    → figures; examples/*.png (+ npz via Python helper)
 ```
+
+Committed examples: `demo_*.png` and `demo_geometry.npz`. Local `*.mat` dumps are gitignored.
 
 ---
 
 ## Privacy & ethics
 
-This project uses **destructive de-identification** for anything that could point back to real physiological imaging:
-
-- No CT / MRI / DICOM, no subject identifiers, no recoverable skull segmentations  
-- Geometry is a **coarse synthetic outline** (e.g. elliptical ring), not an anatomical phantom derived from a scan  
-- Local paths and thesis imaging directories are omitted from the public tree  
-
-Do **not** commit real head volumes, clinical exports, full thesis PDFs with embedded scans, or reversible “masked” copies of the same data.
+- No CT / MRI / DICOM, no subject IDs, no recoverable anatomical masks  
+- Geometry is a **coarse synthetic outline** only  
+- Do not commit blurred real volumes, thesis PDFs with embedded scans, or absolute imaging paths  
 
 ---
 
@@ -80,26 +78,27 @@ Do **not** commit real head volumes, clinical exports, full thesis PDFs with emb
 
 | Path | Role |
 |------|------|
-| `matlab/run_pipeline.m` | End-to-end entry point |
-| `matlab/*.m` | Pipeline steps and legacy redirects |
-| `examples/` | Synthetic PNGs / arrays only |
-| `notes/` | Non-sensitive parameter notes |
+| `matlab/run_pipeline.m` | Entry point |
+| `matlab/demo_params.m` | Parameters |
+| `matlab/*.m` | Pipeline steps / legacy redirects |
+| `scripts/` | Geometry export + static checks (Python) |
+| `examples/` | Synthetic artifacts only |
+| `notes/` | Non-sensitive notes / changelog |
+
+---
+
+## Limitations
+
+- Lightweight 2-D demo grid; not a figure-for-figure thesis reproduction  
+- Arc / sector source is parameterized, not a full bowl `kWaveArray`  
+- k-Wave execution depends on your local toolbox install  
 
 ---
 
 ## Citation
 
-If you use this demo pipeline, please cite the undergraduate thesis (Chinese title above), author Chiyu Wang, Xi’an Jiaotong University, June 2024. This repository is a **code companion**, not a substitute for the full thesis.
-
----
+Cite the undergraduate thesis (Chinese title above), Chiyu Wang, Xi’an Jiaotong University, June 2024. This repository is a **code companion**, not a substitute for the full thesis.
 
 ## License
 
-No SPDX license file is attached yet. All rights reserved by the author unless a license is added later. Third-party toolboxes (MATLAB, k-Wave) remain under their own terms.
-
----
-
-## Related
-
-- Do not vendor MATLAB or k-Wave into this repo.  
-- Companion student projects on the same account include course algorithm drills and MCU lab notes; this tree is ultrasound-field modeling only.
+No SPDX license file yet. Rights remain with the author unless a license is added later. MATLAB and k-Wave remain under their own terms.
