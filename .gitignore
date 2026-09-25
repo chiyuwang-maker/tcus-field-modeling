@@ -1,0 +1,17 @@
+# MATLAB / OS
+*.asv
+*.m~
+.DS_Store
+Thumbs.db
+*.exe
+*.pdb
+*.mat
+*.fig
+*.dcm
+*.zip
+*.rar
+*密码*
+*password*
+.vs/
+Debug/
+Release/

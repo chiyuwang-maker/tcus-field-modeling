@@ -1,0 +1,13 @@
+source_diameter=15e-3
+source_roc=150e-3
+source_amp=1e6
+source_f0=0.3e6
+dt=80e-9
+kgrid=makeGrid(120,2e-3,120,2e-3,56,2e-3)
+target_position_1=[64,95,28]
+transducer_position_1=[64,20,28]
+kgrid_1.setTime(round(Nt/1.2),dt)
+kgrid.setTime(round(Nt),dt)
+Nt=round(t_end/dt)
+t_end=max_distance/sound_speed
+max_distance=sqrt(120^2+120^2+156^2)*2e-3
