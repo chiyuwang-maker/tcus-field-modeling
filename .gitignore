@@ -8,6 +8,8 @@ Thumbs.db
 *.mat
 *.fig
 *.dcm
+*.nii
+*.nii.gz
 *.zip
 *.rar
 *密码*
@@ -15,3 +17,11 @@ Thumbs.db
 .vs/
 Debug/
 Release/
+
+# imaging / geometry — never commit
+**/DICOM/**
+**/dicom/**
+*颅骨几何*
+*几何数据*
+*skull*mask*.mat
+*head*phantom*

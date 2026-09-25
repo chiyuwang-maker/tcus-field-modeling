@@ -1,35 +1,4 @@
-kgrid=makeGrid(512,0.0004727,464,0.0004727)
-dt=1/(5*10^5)/20
-kgrid.t_array=0:dt:360*dt
-%%%打开颅骨几何数据:毕业设计资料/颅骨几何数据
-%%%%%声场介质
-lugu_xishou=0.8
-lugu_density=1750
-lugu_speed=3360
-lugu_pinlvsunhao=1.35
-lugu_sunhao=0.8*(0.5*10^6)^1.35
-v_sun=lugu_sunhao*v
-shui=ones(512,464)-v
-shui_speed=1580
-shui_density=1000
-shui_xishou=0.02*(5*10^5)^2
-medium.speed=shui*shui_speed+v*lugu_speed
-medium.density=shui*shui_density+v*shui_density
-medium.alpha_coeff=shui*shui_xishou+v*lugu_sunhao
-medium.alpha_power=0
-%%%%%设置声源
-%%%声源：0.5MHz正弦波信号
-%单周期时间点：20，相位移动18°，pi/10
-%重复周期20个
-n=1:1:20*18
-signal_array=cos(pi/10*n)
-figure
-for i=1:1:5
-  p_source=makeCircle(50,464,25,232,i,2*pi)-makeCircle(50,464,25,232,i,pi)
-end
-soure.p_mask=[p_source;ones(462,464)]
-soure.p=signal_array
-%%%%%设置探测器
-sensor.mask=[zeros(512,89),ones(512,290),zeros(512,65)]
-senor.record=['p']
-stimulation=kspaceFirstOrder2D(kgrid,medium,soure,senor)
+% Legacy main simulation script — redirected to the privacy-safe pipeline.
+% Original thesis scripts loaded imaging-derived skull geometry; that path is removed.
+% Prefer: run_pipeline
+run_pipeline

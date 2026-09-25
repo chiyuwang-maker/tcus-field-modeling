@@ -1,8 +1,12 @@
-%  lou=stimulation.p(1:290,25)'
-%  for i=1:1:511
-%      ouy=stimulation.p(1+290*i:290+290*i,2)'
-%      lou=[lou;ouy]
-%  end
-% lue=lou/max(max(lou))
-imshow(lou)
-lou=lou/1000000
+% Legacy visualization fragment. Prefer visualize_results in run_pipeline.
+% Example (after a pipeline run that left variables in the workspace):
+%   visualize_results(phantom, bone_mask, sensor_data)
+if exist('phantom', 'var') && exist('bone_mask', 'var')
+    if exist('sensor_data', 'var')
+        visualize_results(phantom, bone_mask, sensor_data);
+    else
+        visualize_results(phantom, bone_mask, []);
+    end
+else
+    warning('No phantom/bone_mask in workspace. Run run_pipeline first.');
+end
